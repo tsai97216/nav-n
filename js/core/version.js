@@ -1,5 +1,5 @@
 const NAV_VERSION = {
-  url: "./data/version.json"
+  url: "../../data/version.json"
 };
 
 export async function loadVersion() {
