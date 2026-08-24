@@ -1,0 +1,39 @@
+[
+  {
+    "taxonomy": "常用推薦",
+    "icon": "fa-solid fa-star",
+    "links": [
+      {"title":"Google","url":"https://www.google.com/","description":"用於網路搜尋、查詢資料與探索網站的搜尋引擎。"},
+      {"title":"ChatGPT","url":"https://chatgpt.com/","description":"用於問答、分析、寫作與程式協助的通用 AI 助手。"},
+      {"title":"YouTube","url":"https://www.youtube.com/","description":"提供影片、直播與創作者內容的影音平台。"},
+      {"title":"GitHub","url":"https://github.com/","description":"用於程式碼管理、開源專案協作與開發的程式碼平台。"},
+      {"title":"Notion","url":"https://app.notion.com/","description":"用於筆記、文件整理、資料庫與個人工作管理的工具。"}
+    ]
+  },
+  {
+    "taxonomy": "工具",
+    "icon": "fa-solid fa-screwdriver-wrench",
+    "list": [
+      {
+        "term": "實用",
+        "links": [
+          {"title":"能不能好好說話","url":"https://lab.magiconch.com/nbnhhsh/","description":"中文縮寫與拼音縮寫轉換工具。"},
+          {"title":"工具邦","url":"https://tw.piliapp.com/","description":"提供各類線上小工具的工具集合網站。"},
+          {"title":"is.gd","url":"https://is.gd/","description":"用於縮短網址的線上服務。"}
+        ]
+      }
+    ]
+  },
+  {
+    "taxonomy": "開發與服務",
+    "icon": "fa-solid fa-code",
+    "list": [
+      {
+        "term": "開發",
+        "links": [
+          {"title":"GitHub","url":"https://github.com/","description":"用於程式碼管理、開源專案協作與開發的程式碼平台。"}
+        ]
+      }
+    ]
+  }
+]
