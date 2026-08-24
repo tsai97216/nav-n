@@ -2,6 +2,15 @@
 
 All notable changes to Chi NAV are documented here.
 
+## [3.0.2] - 2026-08-24
+
+### Changed
+- Unified the visual treatment of Favorites, Frequent, Recent, and normal website sections.
+- Refined section spacing and heading hierarchy.
+- Standardized card spacing and reserved space for the favorite control.
+- Refined favorite button placement, hover, and focus states.
+- Kept desktop and mobile card layouts consistent.
+
 ## [3.0.1] - 2026-08-24
 
 ### Added
