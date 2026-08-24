@@ -1,0 +1,64 @@
+name: Import NAV legacy data
+
+on:
+  push:
+    paths:
+      - '.github/workflows/import-nav-old.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Fetch legacy data
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/tsai97216/nav-old/main/data/data.json -o data/data.json
+          jq empty data/data.json
+          echo "Legacy data JSON is valid."
+
+      - name: Validate structure and duplicates
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const data = JSON.parse(fs.readFileSync('data/data.json', 'utf8'));
+          if (!Array.isArray(data)) throw new Error('Root must be an array');
+
+          let total = 0;
+          const taxonomies = new Set();
+          for (const section of data) {
+            if (!section || typeof section.taxonomy !== 'string') throw new Error('Invalid taxonomy');
+            if (taxonomies.has(section.taxonomy)) throw new Error(`Duplicate taxonomy: ${section.taxonomy}`);
+            taxonomies.add(section.taxonomy);
+            const links = [
+              ...(Array.isArray(section.links) ? section.links : []),
+              ...(Array.isArray(section.list) ? section.list.flatMap(x => Array.isArray(x.links) ? x.links : []) : [])
+            ];
+            const urls = new Set();
+            for (const link of links) {
+              if (!link || typeof link.title !== 'string' || typeof link.url !== 'string') throw new Error(`Invalid link in ${section.taxonomy}`);
+              if (urls.has(link.url)) throw new Error(`Duplicate URL within taxonomy ${section.taxonomy}: ${link.url}`);
+              urls.add(link.url);
+              total++;
+            }
+          }
+          console.log(`Sections: ${data.length}`);
+          console.log(`Websites: ${total}`);
+          console.log('Cross-taxonomy duplicates are allowed.');
+          NODE
+
+      - name: Commit imported data
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/data.json
+          if git diff --cached --quiet; then
+            echo 'No data changes.'
+          else
+            git commit -m 'data: import complete NAV legacy dataset'
+            git push
+          fi
