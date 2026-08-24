@@ -54,13 +54,16 @@ function validateLinks(links, path, errors) {
   );
 }
 
+function normalizeUrl(value) {
+  return value.trim().replace(/\/$/, "").toLowerCase();
+}
+
 export function validateData(data) {
   if (!Array.isArray(data)) {
     throw new Error("資料格式錯誤：頂層必須是陣列");
   }
 
   const errors = [];
-  const seenUrls = new Set();
   const sections = [];
 
   data.forEach((section, sectionIndex) => {
@@ -109,12 +112,14 @@ export function validateData(data) {
       }
     }
 
-    sectionLinks.forEach((link) => {
-      const normalizedUrl = link.url.trim().replace(/\/$/, "").toLowerCase();
-      if (seenUrls.has(normalizedUrl)) {
-        errors.push(`重複網站 URL：${link.url}`);
+    // 同一個分類內不能重複；不同分類可以刻意收錄同一網站。
+    const sectionUrls = new Set();
+    sectionLinks.forEach(link => {
+      const normalizedUrl = normalizeUrl(link.url);
+      if (sectionUrls.has(normalizedUrl)) {
+        errors.push(`同一分類內重複網站 URL：${link.url}`);
       } else {
-        seenUrls.add(normalizedUrl);
+        sectionUrls.add(normalizedUrl);
       }
     });
 
