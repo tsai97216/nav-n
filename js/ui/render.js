@@ -1,6 +1,7 @@
 import { state } from "../core/state.js";
 import { escapeHtml } from "./html.js";
 import { renderCards, initializeCardInteractions } from "./card.js";
+import { renderFavoritesSection } from "./personalized.js";
 
 function filterLinks(links, query, taxonomy = "") {
   if (!Array.isArray(links)) return [];
@@ -37,11 +38,7 @@ export function getVisibleSections() {
             .filter(subcategory => subcategory.links.length)
         : [];
 
-      return {
-        ...section,
-        links: directLinks,
-        list
-      };
+      return { ...section, links: directLinks, list };
     })
     .filter(section => section.links.length || section.list.length);
 }
@@ -50,7 +47,9 @@ export function renderSections(sections = getVisibleSections()) {
   const content = document.querySelector("#content");
   if (!content) return;
 
-  if (!sections.length) {
+  const favorites = state.query ? "" : renderFavoritesSection();
+
+  if (!sections.length && !favorites) {
     content.innerHTML = `
       <section class="empty-state" aria-live="polite">
         <h3>找不到符合的網站</h3>
@@ -60,7 +59,7 @@ export function renderSections(sections = getVisibleSections()) {
     return;
   }
 
-  content.innerHTML = sections.map((section, index) => {
+  content.innerHTML = favorites + sections.map((section, index) => {
     const directLinks = section.links?.length
       ? `<div class="content-grid">${renderCards(section.links)}</div>`
       : "";
