@@ -62,3 +62,5 @@ jobs:
             git commit -m 'data: import complete NAV legacy dataset'
             git push
           fi
+
+# Triggered by changes to this workflow so the import runs exactly once.
