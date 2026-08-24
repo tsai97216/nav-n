@@ -5,9 +5,9 @@
 ## 📍 Current Progress
 
 - **Current Phase:** Phase 0：基礎規格與安全底座
-- **Current subphase:** 0.4 Cache Strategy
-- **Completed:** 0.1 Repository 基本驗收、0.2 Project Structure 基本骨架、0.3 Version System 基本建立
-- **Pending:** 0.2 CSS 分層與 Assets 統一的完整整理、0.3 commit / builtAt 自動化、0.4 Cache Strategy、0.5 Validation 部署阻擋
+- **Current subphase:** 0.4 Cache Strategy / 0.5 Validation gate
+- **Completed:** 0.1 Repository 基本驗收、0.2 JS 模組基本骨架、0.3 Version System 基本建立、0.4 基本 cache-busting、0.5 CI validation 基本檢查
+- **Pending:** 0.2 CSS 分層與 Assets 統一、0.3 commit / builtAt 自動化、0.4 完整 JS module graph cache-busting 與舊 JS + 新 Data 混用防護、0.4 更新流程正式文件化、0.5 將 validation 與正式部署 gate 完整串接
 - **Rule:** 未通過當前 Phase 驗收，不進下一個 Phase。
 
 ## Phase 0：基礎規格與安全底座
@@ -49,11 +49,12 @@
 - [x] Stable / Beta channel
 
 ### 0.4 Cache Strategy
-- [ ] HTML 不長期 cache
-- [ ] version.json 不 cache
-- [ ] JS / CSS 使用版本 query
-- [ ] data.json 使用版本 query
-- [ ] 定義更新流程
+- [x] HTML 加入不長期 cache 的 metadata
+- [x] version.json 使用 `no-store`
+- [x] 主要 JS entry / CSS 使用版本 query
+- [x] data.json 使用 dataVersion query
+- [ ] JS module graph 完整版本化
+- [ ] 定義完整更新流程
 - [ ] 防止舊 JS + 新 Data 混用
 
 ### 0.5 Validation
@@ -63,14 +64,18 @@
 
 檢查：
 - [x] JSON
-- [x] Schema
+- [x] Schema 基本結構
 - [x] URL
 - [x] taxonomy
 - [x] duplicate
 - [x] icon
 - [x] 必填欄位
+- [x] JavaScript syntax
+- [x] HTML 基本結構
+- [x] CSS brace balance
+- [x] GitHub Actions 在相關 push / pull request 執行 validation
 
-- [ ] 任何 validation 失敗禁止部署
+- [ ] 任何 validation 失敗禁止正式部署
 
 ## Phase 1：Data Layer
 
