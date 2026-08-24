@@ -1,4 +1,4 @@
-import { state } from "./state.js";
+import { state, setState } from "./state.js";
 import { EVENTS, emit } from "./events.js";
 import { loadVersion } from "./version.js";
 import { loadData } from "../data/loader.js";
@@ -15,12 +15,20 @@ export async function start() {
     throw new Error("NAV content container not found.");
   }
 
+  setState({ status: "loading", error: null });
+  content.setAttribute("aria-busy", "true");
+  content.innerHTML = `
+    <section class="loading-state" aria-live="polite">
+      <p>正在載入 NAV…</p>
+    </section>
+  `;
+
   try {
     let version = null;
 
     try {
       version = await loadVersion();
-      state.version = version;
+      setState({ version });
       emit(EVENTS.VERSION_READY, { version });
     } catch (error) {
       console.warn("NAV 版本資訊載入失敗，繼續使用 NAV：", error);
@@ -30,27 +38,29 @@ export async function start() {
     const validatedData = validateData(rawData);
     const normalizedData = normalizeData(validatedData);
 
-    state.data = normalizedData;
+    setState({ data: normalizedData });
     emit(EVENTS.DATA_READY, { data: normalizedData });
 
     renderSections(state.data);
     renderNavigation();
     initializeSearch();
 
+    setState({ status: "ready", error: null });
+    content.setAttribute("aria-busy", "false");
     emit(EVENTS.READY, {
       version: state.version,
       data: state.data
     });
   } catch (error) {
-    state.error = error;
+    setState({ status: "error", error });
+    content.setAttribute("aria-busy", "false");
     emit(EVENTS.ERROR, { error });
 
     console.error("NAV 載入失敗：", error);
     content.innerHTML = `
-      <section class="error-state">
+      <section class="error-state" role="alert">
         <h3>目前無法載入 NAV</h3>
         <p>網站資料暫時無法載入，請稍後再試。</p>
-        <small>${error.message}</small>
       </section>
     `;
   }
