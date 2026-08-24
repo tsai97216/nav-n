@@ -1,0 +1,9 @@
+{
+  "name":"Chi NAV",
+  "short_name":"Chi NAV",
+  "start_url":"/",
+  "display":"standalone",
+  "background_color":"#f5f6f8",
+  "theme_color":"#f5f6f8",
+  "description":"Chi 的個人網站導航與常用工具箱"
+}
