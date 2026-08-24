@@ -1,5 +1,6 @@
 export const state = {
   data: [],
   query: "",
-  currentSection: null
+  currentSection: null,
+  version: null
 };
