@@ -9,6 +9,18 @@ import { renderSections } from "../ui/render.js";
 import { renderNavigation } from "../ui/navigation.js";
 import { initializeSearch } from "../ui/search.js";
 
+function renderVersion(version) {
+  const element = document.querySelector("#nav-version");
+  if (!element) return;
+
+  if (version?.version) {
+    const build = version.build != null ? ` · build ${version.build}` : "";
+    element.textContent = `Version ${version.version}${build}`;
+  } else {
+    element.textContent = "Version unavailable";
+  }
+}
+
 export async function start() {
   const content = document.querySelector("#content");
 
@@ -30,9 +42,11 @@ export async function start() {
     try {
       version = await loadVersion();
       setState({ version });
+      renderVersion(version);
       emit(EVENTS.VERSION_READY, { version });
     } catch (error) {
       console.warn("NAV 版本資訊載入失敗，繼續使用 NAV：", error);
+      renderVersion(null);
     }
 
     setState({ preferences: loadPreferences() });
