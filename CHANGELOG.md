@@ -2,6 +2,12 @@
 
 All notable changes to Chi NAV are documented here.
 
+## [3.1.5] - 2026-08-25
+
+### Added
+- Added `NAV-3.0-ROADMAP.md` as the repository's authoritative NAV 3.0 development checklist.
+- Added progress tracking rules so each work cycle must review the roadmap and record completed and pending items.
+
 ## [3.1.4] - 2026-08-25
 
 ### Fixed
