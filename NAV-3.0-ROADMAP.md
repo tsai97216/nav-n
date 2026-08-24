@@ -2,67 +2,75 @@
 
 > 施工原則：先地基、再骨架、再功能，最後才是裝飾。沒有通過當前 Phase 的驗收，就不進下一個 Phase。
 
+## 📍 Current Progress
+
+- **Current Phase:** Phase 0：基礎規格與安全底座
+- **Current subphase:** 0.4 Cache Strategy
+- **Completed:** 0.1 Repository 基本驗收、0.2 Project Structure 基本骨架、0.3 Version System 基本建立
+- **Pending:** 0.2 CSS 分層與 Assets 統一的完整整理、0.3 commit / builtAt 自動化、0.4 Cache Strategy、0.5 Validation 部署阻擋
+- **Rule:** 未通過當前 Phase 驗收，不進下一個 Phase。
+
 ## Phase 0：基礎規格與安全底座
 
 ### 0.1 Repository
-- nav-old 保留舊 NAV
-- nav 作為 NAV 3.0
-- nav.chi.qzz.io 綁定新版
-- 確認 GitHub Pages / HTTPS / CNAME
+- [x] nav-old 保留舊 NAV
+- [x] nav 作為 NAV 3.0
+- [x] nav.chi.qzz.io 綁定新版
+- [x] 確認 GitHub Pages / HTTPS / CNAME
 
 ### 0.2 Project Structure
-- 最終目錄結構
-- JS 模組責任明確
-- CSS 分層
-- Assets 統一位置
+- [x] 最終目錄結構基本骨架
+- [x] JS 模組責任明確
+- [ ] CSS 分層
+- [ ] Assets 統一位置
 
 ### 0.3 Version System
 建立：
-- `data/version.json`
-- `CHANGELOG.md`
+- [x] `data/version.json`
+- [x] `CHANGELOG.md`
 
 包含：
-- version
-- build
-- dataVersion
-- schemaVersion
-- commit
-- builtAt
-- channel
+- [x] version
+- [x] build
+- [x] dataVersion
+- [x] schemaVersion
+- [ ] commit 自動注入
+- [ ] builtAt 自動生成
+- [x] channel
 
 功能：
-- 版本顯示
-- Build ID
-- Data Version
-- Schema Version
-- Git Commit
-- Build Time
-- Changelog
-- Stable / Beta channel
+- [x] 版本顯示
+- [x] Build ID
+- [x] Data Version
+- [x] Schema Version
+- [ ] Git Commit 自動注入
+- [ ] Build Time 自動生成
+- [x] Changelog
+- [x] Stable / Beta channel
 
 ### 0.4 Cache Strategy
-- HTML 不長期 cache
-- version.json 不 cache
-- JS / CSS 使用版本 query
-- data.json 使用版本 query
-- 定義更新流程
-- 防止舊 JS + 新 Data 混用
+- [ ] HTML 不長期 cache
+- [ ] version.json 不 cache
+- [ ] JS / CSS 使用版本 query
+- [ ] data.json 使用版本 query
+- [ ] 定義更新流程
+- [ ] 防止舊 JS + 新 Data 混用
 
 ### 0.5 Validation
 建立：
-- `schema.json`
-- validator
+- [x] `schema.json`
+- [x] validator
 
 檢查：
-- JSON
-- Schema
-- URL
-- taxonomy
-- duplicate
-- icon
-- 必填欄位
+- [x] JSON
+- [x] Schema
+- [x] URL
+- [x] taxonomy
+- [x] duplicate
+- [x] icon
+- [x] 必填欄位
 
-任何 validation 失敗禁止部署。
+- [ ] 任何 validation 失敗禁止部署
 
 ## Phase 1：Data Layer
 
@@ -126,6 +134,7 @@ validator
 模組之間透過 event / state 溝通。
 
 ### 2.3 App Lifecycle
+固定：
 ```text
 Bootstrap
  ↓
@@ -238,7 +247,7 @@ Card
 
 ## Phase 7：Admin
 
-最簡單的 GitHub-based Admin：
+最簡單的 GitHub-based Admin
 
 `/admin`
 
@@ -254,7 +263,7 @@ Card
 - 排序
 - Preview
 
-Data Flow：
+Data Flow
 ```text
 Admin
  ↓
@@ -271,7 +280,7 @@ Deploy
 
 ## Phase 8：CI / CD
 
-GitHub Actions：
+GitHub Actions
 ```text
 Push
  ↓
@@ -394,7 +403,7 @@ NAV 3.0
 ⑳ Debug / Health
 ```
 
-## 驗收規則
+## 🚦 驗收規則
 
 每個階段都有完成條件。
 
