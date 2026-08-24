@@ -2,6 +2,11 @@
 
 All notable changes to Chi NAV are documented here.
 
+## [3.1.3] - 2026-08-25
+
+### Fixed
+- Preserved the NAV hierarchy during data validation so links inside subcategories are rendered only under their corresponding subcategory instead of being duplicated under the parent taxonomy.
+
 ## [3.1.0] - 2026-08-24
 
 ### Changed
