@@ -1,13 +1,6 @@
 import { state } from "../core/state.js";
-
-function escapeHtml(value) {
-  return String(value).replace(/[&<>\"]/g, char => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    "\"": "&quot;"
-  }[char]));
-}
+import { escapeHtml } from "./html.js";
+import { renderCards } from "./card.js";
 
 function filterLinks(links, query, taxonomy = "") {
   if (!Array.isArray(links)) return [];
@@ -53,21 +46,19 @@ export function getVisibleSections() {
     .filter(section => section.links.length || section.list.length);
 }
 
-export function renderCards(links) {
-  return links.map(link => `
-    <a class="card" href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer">
-      ${link.icon ? `<i class="card-icon ${escapeHtml(link.icon)}" aria-hidden="true"></i>` : ""}
-      <div class="card-body">
-        <div class="card-title">${escapeHtml(link.title)}</div>
-        ${link.description ? `<div class="card-desc">${escapeHtml(link.description)}</div>` : ""}
-      </div>
-    </a>
-  `).join("");
-}
-
 export function renderSections(sections = getVisibleSections()) {
   const content = document.querySelector("#content");
   if (!content) return;
+
+  if (!sections.length) {
+    content.innerHTML = `
+      <section class="empty-state" aria-live="polite">
+        <h3>找不到符合的網站</h3>
+        <p>試試其他關鍵字。</p>
+      </section>
+    `;
+    return;
+  }
 
   content.innerHTML = sections.map((section, index) => {
     const directLinks = section.links?.length
