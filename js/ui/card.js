@@ -1,6 +1,7 @@
 import { escapeHtml } from "./html.js";
 import { renderIcon } from "./icon.js";
 import { isFavorite, toggleFavoriteForUrl } from "./favorites.js";
+import { recordRecentForUrl } from "./recent.js";
 
 function renderFavoriteButton(url) {
   const active = isFavorite(url);
@@ -59,6 +60,16 @@ export function initializeCardInteractions(root = document) {
       button.textContent = active ? "★" : "☆";
       button.setAttribute("aria-label", active ? "取消收藏" : "加入收藏");
       button.setAttribute("aria-pressed", String(active));
+    });
+  });
+
+  root.querySelectorAll("a[data-link-url]").forEach(link => {
+    if (link.dataset.recentBound === "true") return;
+    link.dataset.recentBound = "true";
+
+    link.addEventListener("click", () => {
+      const url = link.dataset.linkUrl;
+      if (url) recordRecentForUrl(url);
     });
   });
 }
