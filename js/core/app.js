@@ -1,4 +1,5 @@
 import { state } from "./state.js";
+import { loadVersion } from "./version.js";
 import { loadData } from "../data/loader.js";
 import { validateData } from "../data/validator.js";
 import { normalizeData } from "../data/normalizer.js";
@@ -10,7 +11,16 @@ export async function start() {
   const content = document.querySelector("#content");
 
   try {
-    const rawData = await loadData();
+    let version = null;
+
+    try {
+      version = await loadVersion();
+      state.version = version;
+    } catch (error) {
+      console.warn("NAV 版本資訊載入失敗，繼續使用 NAV：", error);
+    }
+
+    const rawData = await loadData(version);
     state.data = normalizeData(validateData(rawData));
     renderSections(state.data);
     renderNavigation();
