@@ -30,7 +30,9 @@
     "list": [
       {
         "term": "開發",
-        "links": []
+        "links": [
+          {"title":"GitHub","url":"https://github.com/","description":"用於程式碼管理、開源專案協作與開發的程式碼平台。"}
+        ]
       }
     ]
   }
