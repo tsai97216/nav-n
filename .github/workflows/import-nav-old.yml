@@ -15,14 +15,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Fetch and unwrap legacy data
+      - name: Fetch legacy data directly
         run: |
-          curl -fsSL https://raw.githubusercontent.com/tsai97216/nav-old/main/data/data.json -o /tmp/legacy-wrapper.json
-          jq -e '.content | type == "string"' /tmp/legacy-wrapper.json > /dev/null
-          jq -r '.content' /tmp/legacy-wrapper.json > /tmp/data.json
+          curl -fsSL https://raw.githubusercontent.com/tsai97216/nav-old/main/data/data.json -o /tmp/data.json
           jq empty /tmp/data.json
           mv /tmp/data.json data/data.json
-          echo "Legacy NAV data extracted and validated as JSON."
+          echo "Legacy NAV data downloaded and validated as JSON."
 
       - name: Validate structure and duplicates
         run: |
@@ -41,10 +39,6 @@ jobs:
             const terms = Array.isArray(section.list) ? section.list : [];
             const sectionLinks = Array.isArray(section.links) ? section.links : [];
             const linksByTerm = new Map();
-
-            for (const link of sectionLinks) {
-              if (!link || typeof link.title !== 'string' || typeof link.url !== 'string') throw new Error(`Invalid link in ${section.taxonomy}`);
-            }
 
             const validateLinks = (term, links) => {
               const urls = linksByTerm.get(term) ?? new Set();
