@@ -1,4 +1,4 @@
-name: Import NAV legacy data
+name: Repair NAV data JSON
 
 on:
   push:
@@ -9,39 +9,47 @@ permissions:
   contents: write
 
 jobs:
-  import:
+  repair:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Fetch legacy data directly
+      - name: Unwrap and validate data.json
         run: |
-          curl -fsSL https://raw.githubusercontent.com/tsai97216/nav-old/main/data/data.json -o /tmp/data.json
+          jq -e '.content | fromjson | type == "array"' data/data.json > /dev/null
+          jq -r '.content' data/data.json > /tmp/data.json
           jq empty /tmp/data.json
           mv /tmp/data.json data/data.json
-          echo "Legacy NAV data downloaded and validated as JSON."
+          echo 'data.json restored as a native JSON array.'
 
-      - name: Validate structure and duplicates
+      - name: Validate NAV structure
         run: |
           node <<'NODE'
           const fs = require('fs');
           const data = JSON.parse(fs.readFileSync('data/data.json', 'utf8'));
           if (!Array.isArray(data)) throw new Error('Root must be an array');
 
-          let total = 0;
           const taxonomies = new Set();
+          let total = 0;
           for (const section of data) {
             if (!section || typeof section.taxonomy !== 'string') throw new Error('Invalid taxonomy');
             if (taxonomies.has(section.taxonomy)) throw new Error(`Duplicate taxonomy: ${section.taxonomy}`);
             taxonomies.add(section.taxonomy);
 
-            const terms = Array.isArray(section.list) ? section.list : [];
-            const sectionLinks = Array.isArray(section.links) ? section.links : [];
-            const linksByTerm = new Map();
+            const groups = [];
+            if (Array.isArray(section.links)) groups.push(['__root__', section.links]);
+            if (Array.isArray(section.list)) {
+              for (const item of section.list) {
+                if (!item || typeof item.term !== 'string' || !Array.isArray(item.links)) {
+                  throw new Error(`Invalid subsection in ${section.taxonomy}`);
+                }
+                groups.push([item.term, item.links]);
+              }
+            }
 
-            const validateLinks = (term, links) => {
-              const urls = linksByTerm.get(term) ?? new Set();
+            for (const [term, links] of groups) {
+              const urls = new Set();
               for (const link of links) {
                 if (!link || typeof link.title !== 'string' || typeof link.url !== 'string') {
                   throw new Error(`Invalid link in ${section.taxonomy} / ${term}`);
@@ -50,26 +58,15 @@ jobs:
                 urls.add(link.url);
                 total++;
               }
-              linksByTerm.set(term, urls);
-            };
-
-            validateLinks('__root__', sectionLinks);
-
-            for (const item of terms) {
-              if (!item || typeof item.term !== 'string' || !Array.isArray(item.links)) {
-                throw new Error(`Invalid subsection in ${section.taxonomy}`);
-              }
-              validateLinks(item.term, item.links);
             }
           }
 
           console.log(`Sections: ${data.length}`);
           console.log(`Websites: ${total}`);
-          console.log('Cross-taxonomy duplicates are allowed.');
-          console.log('Cross-subcategory duplicates are allowed.');
+          console.log('NAV data validation passed.');
           NODE
 
-      - name: Commit imported data
+      - name: Commit repaired data
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
@@ -77,8 +74,6 @@ jobs:
           if git diff --cached --quiet; then
             echo 'No data changes.'
           else
-            git commit -m 'data: import complete NAV legacy dataset'
+            git commit -m 'fix: restore data.json as native JSON array'
             git push
           fi
-
-# Triggered by changes to this workflow so the import runs exactly once.
