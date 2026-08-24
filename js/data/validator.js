@@ -80,9 +80,12 @@ export function validateData(data) {
     }
 
     const sectionLinks = [];
+    const directLinks = [];
 
     if (section.links !== undefined) {
-      sectionLinks.push(...validateLinks(section.links, `${path}.links`, errors));
+      const validatedDirectLinks = validateLinks(section.links, `${path}.links`, errors);
+      sectionLinks.push(...validatedDirectLinks);
+      directLinks.push(...validatedDirectLinks);
     }
 
     if (section.list !== undefined) {
@@ -90,23 +93,23 @@ export function validateData(data) {
         errors.push(`${path}.list 必須是陣列`);
       } else {
         section.list.forEach((subcategory, subIndex) => {
-          const subPath = `${path}.list[${subIndex}]`;
+          const subPath = `${path}.list[${subIndex}`;
 
           if (!subcategory || typeof subcategory !== "object") {
-            errors.push(`${subPath} 必須是物件`);
+            errors.push(`${subPath}] 必須是物件`);
             return;
           }
 
           if (!isNonEmptyString(subcategory.term)) {
-            errors.push(`${subPath}.term 必須是非空字串`);
+            errors.push(`${subPath}].term 必須是非空字串`);
           }
 
           if (subcategory.links !== undefined) {
             sectionLinks.push(
-              ...validateLinks(subcategory.links, `${subPath}.links`, errors)
+              ...validateLinks(subcategory.links, `${subPath}].links`, errors)
             );
           } else {
-            errors.push(`${subPath}.links 必須存在`);
+            errors.push(`${subPath}].links 必須存在`);
           }
         });
       }
@@ -127,7 +130,10 @@ export function validateData(data) {
       errors.push(`${path} 沒有任何有效網站`);
     }
 
-    sections.push({ ...section, links: sectionLinks });
+    // 保留原本的階層結構：taxonomy → list/subcategory → links。
+    // 不要把子分類的 links 彙整到 section.links，否則 render.js
+    // 會同時在大分類與子分類各渲染一次，造成網站重複顯示。
+    sections.push({ ...section, links: directLinks });
   });
 
   if (errors.length > 0) {
