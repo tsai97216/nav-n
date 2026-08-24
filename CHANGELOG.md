@@ -2,6 +2,14 @@
 
 All notable changes to Chi NAV are documented here.
 
+## [3.1.0] - 2026-08-24
+
+### Changed
+- Migrated the complete website catalog from `nav-old` into the new NAV data structure.
+- Restored the full category and subcategory catalog from the legacy NAV.
+- Preserved intentional cross-category duplicates, such as GitHub appearing in both 常用推薦 and 開發與服務.
+- Increased `dataVersion` from 1 to 2 to reflect the migrated catalog.
+
 ## [3.0.2] - 2026-08-24
 
 ### Changed
