@@ -1,6 +1,7 @@
 import { state, setState } from "./state.js";
 import { EVENTS, emit } from "./events.js";
 import { loadVersion } from "./version.js";
+import { loadPreferences } from "./preferences.js";
 import { loadData } from "../data/loader.js";
 import { validateData } from "../data/validator.js";
 import { normalizeData } from "../data/normalizer.js";
@@ -34,6 +35,8 @@ export async function start() {
       console.warn("NAV 版本資訊載入失敗，繼續使用 NAV：", error);
     }
 
+    setState({ preferences: loadPreferences() });
+
     const rawData = await loadData(version);
     const validatedData = validateData(rawData);
     const normalizedData = normalizeData(validatedData);
@@ -49,7 +52,8 @@ export async function start() {
     content.setAttribute("aria-busy", "false");
     emit(EVENTS.READY, {
       version: state.version,
-      data: state.data
+      data: state.data,
+      preferences: state.preferences
     });
   } catch (error) {
     setState({ status: "error", error });
