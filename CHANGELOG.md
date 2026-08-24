@@ -2,6 +2,13 @@
 
 All notable changes to Chi NAV are documented here.
 
+## [3.1.6] - 2026-08-25
+
+### Changed
+- Added cache-control metadata and versioned URLs for the main HTML assets.
+- Updated NAV validation workflow to validate data structure, URLs, duplicates, icons, required fields, JavaScript syntax, HTML basics, and CSS brace balance on relevant pushes and pull requests.
+- Removed the old data-repair behavior from the workflow so CI no longer rewrites `data/data.json` automatically.
+
 ## [3.1.5] - 2026-08-25
 
 ### Added
