@@ -1,6 +1,6 @@
 import { state } from "../core/state.js";
 import { escapeHtml } from "./html.js";
-import { renderCards } from "./card.js";
+import { renderCards, initializeCardInteractions } from "./card.js";
 
 function filterLinks(links, query, taxonomy = "") {
   if (!Array.isArray(links)) return [];
@@ -80,4 +80,6 @@ export function renderSections(sections = getVisibleSections()) {
       </section>
     `;
   }).join("");
+
+  initializeCardInteractions(content);
 }
