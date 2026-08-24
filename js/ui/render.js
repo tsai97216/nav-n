@@ -2,6 +2,7 @@ import { state } from "../core/state.js";
 import { escapeHtml } from "./html.js";
 import { renderCards, initializeCardInteractions } from "./card.js";
 import { renderFavoritesSection } from "./personalized.js";
+import { renderFrequentSection } from "./frequent-section.js";
 import { renderRecentSection } from "./recent-section.js";
 
 function filterLinks(links, query, taxonomy = "") {
@@ -36,7 +37,9 @@ export function renderSections(sections = getVisibleSections()) {
   if (!content) return;
 
   const hasQuery = Boolean(state.query.trim());
-  const personalized = hasQuery ? "" : renderFavoritesSection() + renderRecentSection();
+  const personalized = hasQuery
+    ? ""
+    : renderFavoritesSection() + renderFrequentSection() + renderRecentSection();
 
   if (!sections.length && !personalized) {
     content.innerHTML = `<section class="empty-state" aria-live="polite"><h3>找不到符合的網站</h3><p>試試其他關鍵字。</p></section>`;
