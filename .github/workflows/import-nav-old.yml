@@ -1,79 +1,129 @@
-name: Repair NAV data JSON
+name: Validate NAV
 
 on:
   push:
+    branches: [main]
     paths:
+      - 'data/data.json'
+      - 'data/schema.json'
+      - 'js/**'
+      - 'index.html'
+      - 'css/**'
+      - '.github/workflows/import-nav-old.yml'
+  pull_request:
+    paths:
+      - 'data/data.json'
+      - 'data/schema.json'
+      - 'js/**'
+      - 'index.html'
+      - 'css/**'
       - '.github/workflows/import-nav-old.yml'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  repair:
+  validate:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Unwrap and validate data.json
-        run: |
-          jq -e '.content | fromjson | type == "array"' data/data.json > /dev/null
-          jq -r '.content' data/data.json > /tmp/data.json
-          jq empty /tmp/data.json
-          mv /tmp/data.json data/data.json
-          echo 'data.json restored as a native JSON array.'
-
-      - name: Validate NAV structure
+      - name: Validate JSON and NAV data structure
         run: |
           node <<'NODE'
           const fs = require('fs');
           const data = JSON.parse(fs.readFileSync('data/data.json', 'utf8'));
-          if (!Array.isArray(data)) throw new Error('Root must be an array');
+          const schema = JSON.parse(fs.readFileSync('data/schema.json', 'utf8'));
+
+          if (!Array.isArray(data)) throw new Error('data.json root must be an array');
+          if (schema.type !== 'array') throw new Error('schema.json root must be an array schema');
 
           const taxonomies = new Set();
           let total = 0;
+          const urlPattern = /^https?:\/\//;
+
           for (const section of data) {
-            if (!section || typeof section.taxonomy !== 'string') throw new Error('Invalid taxonomy');
-            if (taxonomies.has(section.taxonomy)) throw new Error(`Duplicate taxonomy: ${section.taxonomy}`);
+            if (!section || typeof section.taxonomy !== 'string' || !section.taxonomy.trim()) {
+              throw new Error('Invalid taxonomy');
+            }
+            if (taxonomies.has(section.taxonomy)) {
+              throw new Error(`Duplicate taxonomy: ${section.taxonomy}`);
+            }
             taxonomies.add(section.taxonomy);
 
             const groups = [];
-            if (Array.isArray(section.links)) groups.push(['__root__', section.links]);
-            if (Array.isArray(section.list)) {
-              for (const item of section.list) {
-                if (!item || typeof item.term !== 'string' || !Array.isArray(item.links)) {
-                  throw new Error(`Invalid subsection in ${section.taxonomy}`);
-                }
-                groups.push([item.term, item.links]);
-              }
+            if (Array.isArray(section.links)) groups.push([section.taxonomy, section.links]);
+            if (section.links !== undefined && !Array.isArray(section.links)) {
+              throw new Error(`Invalid links in ${section.taxonomy}`);
             }
 
-            for (const [term, links] of groups) {
+            if (section.list !== undefined && !Array.isArray(section.list)) {
+              throw new Error(`Invalid list in ${section.taxonomy}`);
+            }
+
+            for (const item of section.list || []) {
+              if (!item || typeof item.term !== 'string' || !item.term.trim() || !Array.isArray(item.links)) {
+                throw new Error(`Invalid subsection in ${section.taxonomy}`);
+              }
+              groups.push([`${section.taxonomy} / ${item.term}`, item.links]);
+            }
+
+            for (const [groupName, links] of groups) {
               const urls = new Set();
               for (const link of links) {
-                if (!link || typeof link.title !== 'string' || typeof link.url !== 'string') {
-                  throw new Error(`Invalid link in ${section.taxonomy} / ${term}`);
+                if (!link || typeof link.title !== 'string' || !link.title.trim()) {
+                  throw new Error(`Invalid link title in ${groupName}`);
                 }
-                if (urls.has(link.url)) throw new Error(`Duplicate URL within ${section.taxonomy} / ${term}: ${link.url}`);
+                if (typeof link.url !== 'string' || !urlPattern.test(link.url)) {
+                  throw new Error(`Invalid URL in ${groupName}: ${link.url}`);
+                }
+                if (typeof link.description !== 'string') {
+                  throw new Error(`Missing description in ${groupName}: ${link.title}`);
+                }
+                if (link.icon !== undefined && typeof link.icon !== 'string') {
+                  throw new Error(`Invalid icon in ${groupName}: ${link.title}`);
+                }
+                if (urls.has(link.url)) {
+                  throw new Error(`Duplicate URL within ${groupName}: ${link.url}`);
+                }
                 urls.add(link.url);
                 total++;
               }
             }
           }
 
-          console.log(`Sections: ${data.length}`);
+          console.log(`Taxonomies: ${data.length}`);
           console.log(`Websites: ${total}`);
           console.log('NAV data validation passed.');
           NODE
 
-      - name: Commit repaired data
+      - name: Check JavaScript syntax
         run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/data.json
-          if git diff --cached --quiet; then
-            echo 'No data changes.'
-          else
-            git commit -m 'fix: restore data.json as native JSON array'
-            git push
-          fi
+          find js -name '*.js' -print0 | xargs -0 -n1 node --check
+
+      - name: Basic HTML validation
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const html = fs.readFileSync('index.html', 'utf8');
+          if (!/^<!doctype html>/i.test(html)) throw new Error('index.html is missing <!doctype html>');
+          if (!/<html\b[^>]*lang="[^"]+"/i.test(html)) throw new Error('index.html is missing html lang');
+          if (!/<meta\s+name="viewport"/i.test(html)) throw new Error('index.html is missing viewport');
+          console.log('Basic HTML checks passed.');
+          NODE
+
+      - name: Basic CSS validation
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const css = fs.readFileSync('css/main.css', 'utf8');
+          let depth = 0;
+          for (const ch of css) {
+            if (ch === '{') depth++;
+            if (ch === '}') depth--;
+            if (depth < 0) throw new Error('Unbalanced CSS braces');
+          }
+          if (depth !== 0) throw new Error('Unbalanced CSS braces');
+          console.log('Basic CSS checks passed.');
+          NODE
