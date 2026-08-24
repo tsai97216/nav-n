@@ -1,22 +1,10 @@
 import { escapeHtml } from "./html.js";
-
-function getFaviconUrl(url) {
-  try {
-    const hostname = new URL(url).hostname;
-    return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(hostname)}&sz=64`;
-  } catch {
-    return "";
-  }
-}
+import { renderIcon } from "./icon.js";
 
 export function renderCard(link) {
   if (!link || !link.url || !link.title) return "";
 
-  const fallbackIcon = getFaviconUrl(link.url);
-  const icon = fallbackIcon
-    ? `<img class="card-icon" src="${escapeHtml(fallbackIcon)}" alt="" loading="lazy" decoding="async">`
-    : `<span class="card-icon" aria-hidden="true">◈</span>`;
-
+  const icon = renderIcon(link);
   const description = link.description
     ? `<div class="card-desc">${escapeHtml(link.description)}</div>`
     : "";
