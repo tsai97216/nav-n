@@ -8,20 +8,28 @@ const initialState = {
   preferences: {
     favorites: [],
     recent: [],
-    frequent: []
+    frequent: [],
+    frequentCounts: {}
   }
 };
 
 export const state = {
   ...initialState,
-  preferences: { ...initialState.preferences }
+  preferences: {
+    ...initialState.preferences,
+    frequentCounts: {}
+  }
 };
 
 export function setState(patch) {
   if (patch.preferences) {
     state.preferences = {
       ...state.preferences,
-      ...patch.preferences
+      ...patch.preferences,
+      frequentCounts: {
+        ...state.preferences.frequentCounts,
+        ...(patch.preferences.frequentCounts || {})
+      }
     };
   }
 
@@ -36,7 +44,10 @@ export function setState(patch) {
 export function resetState() {
   Object.assign(state, {
     ...initialState,
-    preferences: { ...initialState.preferences }
+    preferences: {
+      ...initialState.preferences,
+      frequentCounts: {}
+    }
   });
   return state;
 }
