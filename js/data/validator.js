@@ -93,23 +93,23 @@ export function validateData(data) {
         errors.push(`${path}.list 必須是陣列`);
       } else {
         section.list.forEach((subcategory, subIndex) => {
-          const subPath = `${path}.list[${subIndex}`;
+          const subPath = `${path}.list[${subIndex}]`;
 
           if (!subcategory || typeof subcategory !== "object") {
-            errors.push(`${subPath}] 必須是物件`);
+            errors.push(`${subPath} 必須是物件`);
             return;
           }
 
           if (!isNonEmptyString(subcategory.term)) {
-            errors.push(`${subPath}].term 必須是非空字串`);
+            errors.push(`${subPath}.term 必須是非空字串`);
           }
 
           if (subcategory.links !== undefined) {
             sectionLinks.push(
-              ...validateLinks(subcategory.links, `${subPath}].links`, errors)
+              ...validateLinks(subcategory.links, `${subPath}.links`, errors)
             );
           } else {
-            errors.push(`${subPath}].links 必須存在`);
+            errors.push(`${subPath}.links 必須存在`);
           }
         });
       }
