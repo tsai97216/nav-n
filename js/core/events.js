@@ -3,7 +3,8 @@ export const EVENTS = Object.freeze({
   DATA_READY: "nav:data-ready",
   READY: "nav:ready",
   ERROR: "nav:error",
-  SEARCH_CHANGED: "nav:search-changed"
+  SEARCH_CHANGED: "nav:search-changed",
+  PREFERENCES_CHANGED: "nav:preferences-changed"
 });
 
 export const events = new EventTarget();
