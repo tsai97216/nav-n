@@ -2,6 +2,12 @@
 
 All notable changes to Chi NAV are documented here.
 
+## [3.1.4] - 2026-08-25
+
+### Fixed
+- Removed the hard-coded application version from the shared configuration so runtime version information comes exclusively from `data/version.json`.
+- Removed the loader's dependency on a hard-coded fallback version when version metadata is unavailable.
+
 ## [3.1.3] - 2026-08-25
 
 ### Fixed
@@ -38,16 +44,3 @@ All notable changes to Chi NAV are documented here.
 
 ### Changed
 - Refined the NAV card hierarchy and responsive layout.
-- Integrated preferences into the application startup lifecycle.
-- Standardized Card rendering across personalized and normal sections.
-- Improved HTML escaping and icon fallback handling.
-
-## [3.0.0] - 2026-08-24
-
-### Added
-- Established the NAV 3.0 project structure.
-- Added centralized version metadata.
-- Defined application, data, and schema version fields.
-
-### Changed
-- Began rebuilding NAV from a clean architecture while keeping `nav-old` as the legacy reference.

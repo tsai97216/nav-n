@@ -1,8 +1,12 @@
 import { CONFIG } from "../core/config.js";
 
 export async function loadData(version = null) {
-  const cacheVersion = version?.dataVersion ?? version?.version ?? CONFIG.version;
-  const response = await fetch(`${CONFIG.dataUrl}?v=${encodeURIComponent(cacheVersion)}`, {
+  const cacheVersion = version?.dataVersion ?? version?.version ?? null;
+  const dataUrl = cacheVersion
+    ? `${CONFIG.dataUrl}?v=${encodeURIComponent(cacheVersion)}`
+    : CONFIG.dataUrl;
+
+  const response = await fetch(dataUrl, {
     cache: "no-store"
   });
 
