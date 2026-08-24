@@ -1,16 +1,50 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Chi NAV Data",
-  "type": "object",
-  "required": ["schemaVersion", "categories"],
-  "properties": {
-    "schemaVersion": {
-      "type": "integer",
-      "minimum": 1
-    },
-    "categories": {
-      "type": "array"
-    }
+  "type": "array",
+  "items": {
+    "$ref": "#/$defs/section"
   },
-  "additionalProperties": true
+  "$defs": {
+    "link": {
+      "type": "object",
+      "required": ["title", "url", "description"],
+      "properties": {
+        "title": {"type": "string", "minLength": 1},
+        "url": {"type": "string", "pattern": "^https?://"},
+        "description": {"type": "string"},
+        "icon": {"type": "string"}
+      },
+      "additionalProperties": true
+    },
+    "subcategory": {
+      "type": "object",
+      "required": ["term", "links"],
+      "properties": {
+        "term": {"type": "string", "minLength": 1},
+        "links": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/link"}
+        }
+      },
+      "additionalProperties": true
+    },
+    "section": {
+      "type": "object",
+      "required": ["taxonomy"],
+      "properties": {
+        "taxonomy": {"type": "string", "minLength": 1},
+        "icon": {"type": "string"},
+        "links": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/link"}
+        },
+        "list": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/subcategory"}
+        }
+      },
+      "additionalProperties": true
+    }
+  }
 }
